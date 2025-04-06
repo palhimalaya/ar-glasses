@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AR Glasses Example</title>
+    <style>
+      #overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      #video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 1;
+      }
+      #controls {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="controls">
+      <input type="file" id="glasses-upload" accept="image/*" />
+      <button id="start">Start</button>
+    </div>
+
+    <video
+      id="video"
+      autoplay
+      muted
+      playsinline
+      width="640"
+      height="480"
+    ></video>
+    <canvas id="overlay" width="640" height="480"></canvas>
+    <script src="./dist/index.js"></script>
+    <script type="module">
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("overlay");
+      const uploadInput = document.getElementById("glasses-upload");
+      const startButton = document.getElementById("start");
+
+      let glassesImageDataURL = "";
+
+      navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+        video.srcObject = stream;
+      });
+
+      uploadInput.addEventListener("change", (e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            glassesImageDataURL = reader.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      startButton.addEventListener("click", () => {
+        if (glassesImageDataURL) {
+          arGlasses.startGlassesOverlay(video, canvas, glassesImageDataURL);
+        } else {
+          alert("Please upload a glasses image first!");
+        }
+      });
+    </script>
+  </body>
+</html>

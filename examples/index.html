@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AR Glasses Example</title>
+    <style>
+      #overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      #video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+      }
+      #controls {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="controls">
+      <input type="text" id="glasses-url" placeholder="Glasses Image URL" />
+      <button id="start">Start</button>
+    </div>
+
+    <video
+      id="video"
+      autoplay
+      muted
+      playsinline
+      width="640"
+      height="480"
+    ></video>
+    <canvas id="overlay" width="640" height="480"></canvas>
+
+    <script type="module">
+      import startGlassesOverlay from "/dist/index.js";
+
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("overlay");
+      const input = document.getElementById("glasses-url");
+      const button = document.getElementById("start");
+
+      navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+        video.srcObject = stream;
+      });
+
+      button.addEventListener("click", () => {
+        const url = input.value;
+        if (url) {
+          startGlassesOverlay(video, canvas, url, "/models");
+        }
+      });
+    </script>
+  </body>
+</html>
