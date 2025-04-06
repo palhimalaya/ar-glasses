@@ -1,0 +1,12 @@
+/examples
+/src
+
+/rollup.config.js
+/tsconfig.json
+.env
+*.env
+
+/node_modules
+
+.DS_Store
+*.swp

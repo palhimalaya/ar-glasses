@@ -1,10 +1,11 @@
 {
   "name": "ar-glasses",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack --mode production && rollup -c",
+    "prepublish": "npm run build"
   },
   "author": "Himalaya Pal",
   "license": "MIT",
