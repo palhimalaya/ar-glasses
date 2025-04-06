@@ -1,147 +1,161 @@
-Here's your updated **`README.md`** content for the `ar-glasses` NPM package with models loaded internally (no need for user to pass `modelPath`):
+---
+
+# 👓 **AR Glasses**
+
+A lightweight TypeScript library that overlays virtual glasses on detected faces using `face-api.js` and your device's camera.
 
 ---
 
-```markdown
-# 👓 ar-glasses
+## ✨ **Features**
 
-> A lightweight TypeScript library that overlays virtual glasses on detected faces using `face-api.js` and the device's camera.
-
----
-
-## ✨ Features
-
-- 🔍 Real-time face detection using webcam
-- 🕶️ Overlay custom glasses images (URL or uploaded file)
-- 📦 Easy to integrate with any frontend app
-- 💡 Built with TypeScript and compatible with modern bundlers
-- 📁 No manual setup for `face-api.js` models
+- 🔍 **Real-time face detection** using your webcam
+- 🕶️ **Overlay custom glasses images** (supports URLs or file uploads)
+- 📦 **Easy to integrate** with any frontend app
+- 💡 **Built with TypeScript** and compatible with modern bundlers
+- 📁 **Automatic model handling** for `face-api.js` (no manual setup needed)
 
 ---
 
-## 📦 Installation
+## 📦 **Installation**
+
+### Using npm or Yarn
+
+To get started, install the package via npm or yarn:
 
 ```bash
 npm install ar-glasses
 ```
 
-or with Yarn:
+Or with Yarn:
 
 ```bash
 yarn add ar-glasses
 ```
 
----
+### Using a CDN
 
-## 🚀 Usage
-
-### 1. Import the library
-
-```ts
-import startGlassesOverlay from 'ar-glasses';
-```
-
-### 2. HTML Setup
+You can also use the library directly in the browser via a CDN. For example, using [jsDelivr](https://www.jsdelivr.com/):
 
 ```html
-<video id="video" autoplay muted playsinline></video>
-<canvas id="overlay"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/ar-glasses/dist/ar-glasses.umd.js"></script>
 ```
 
-### 3. JavaScript Example
-
-```ts
-const video = document.getElementById('video') as HTMLVideoElement;
-const canvas = document.getElementById('overlay') as HTMLCanvasElement;
-const glassesImage = 'https://yourdomain.com/glasses.png'; // Or a base64 image string
-
-startGlassesOverlay(video, canvas, glassesImage);
-```
+This will expose the library as a global variable `ARGlasses`.
 
 ---
 
-## 📁 File Upload Example
+## 🚀 **Usage**
 
-To allow users to upload their own glasses:
+### React Example
 
-```html
-<input type="file" id="glasses-upload" accept="image/*" />
-```
+```tsx
+import React, { useRef, useEffect, useState } from 'react';
+import { startGlassesOverlay } from 'ar-glasses';
 
-```ts
-const input = document.getElementById('glasses-upload') as HTMLInputElement;
+const ARGlasses = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [glassesImage, setGlassesImage] = useState<string>('');
 
-input.addEventListener('change', () => {
-  const file = input.files?.[0];
-  if (!file) return;
+  useEffect(() => {
+    if (videoRef.current) {
+      navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+        videoRef.current!.srcObject = stream;
+      });
+    }
+  }, []);
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    const dataURL = reader.result as string;
-    startGlassesOverlay(video, canvas, dataURL);
+  const handleStart = () => {
+    if (videoRef.current && canvasRef.current && glassesImage) {
+      startGlassesOverlay(videoRef.current, canvasRef.current, glassesImage);
+    } else {
+      alert('Please upload a glasses image first!');
+    }
   };
-  reader.readAsDataURL(file);
-});
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => setGlassesImage(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  return (
+    <div>
+      <input type="file" accept="image/*" onChange={handleFileChange} />
+      <button onClick={handleStart}>Start</button>
+      <video ref={videoRef} autoPlay muted playsInline width="640" height="480"></video>
+      <canvas ref={canvasRef} width="640" height="480"></canvas>
+    </div>
+  );
+};
+
+export default ARGlasses;
+```
+
+### Plain JavaScript Example (Using CDN)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AR Glasses Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/ar-glasses/dist/ar-glasses.umd.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('overlay');
+        const uploadInput = document.getElementById('glasses-upload');
+        const startButton = document.getElementById('start');
+
+        let glassesImageDataURL = '';
+
+        navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+          video.srcObject = stream;
+        });
+
+        uploadInput.addEventListener('change', (e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+              glassesImageDataURL = reader.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        startButton.addEventListener('click', () => {
+          if (glassesImageDataURL) {
+            ARGlasses.startGlassesOverlay(video, canvas, glassesImageDataURL);
+          } else {
+            alert('Please upload a glasses image first!');
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <input type="file" id="glasses-upload" accept="image/*" />
+    <button id="start">Start</button>
+    <video id="video" autoplay muted playsinline width="640" height="480"></video>
+    <canvas id="overlay" width="640" height="480"></canvas>
+  </body>
+</html>
 ```
 
 ---
 
-## 📂 Model Handling
+## 📂 **Model Handling**
 
-✅ You **don’t need to provide or load any face-api.js model paths**.  
-All necessary models are bundled and loaded automatically.
-
----
-
-## ⚙️ API
-
-```ts
-startGlassesOverlay(
-  videoEl: HTMLVideoElement,
-  canvasEl: HTMLCanvasElement,
-  glassesImageURL: string
-): void
-```
+AR Glasses automatically handles model loading for `face-api.js`. No additional setup is required. Simply upload or link to your preferred glasses image and let the library do the rest!
 
 ---
 
-## 🧪 Local Development with Vite
-
-1. Create a basic Vite app:
-
-```bash
-npm create vite@latest ar-glasses-demo --template vanilla
-cd ar-glasses-demo
-npm install
-```
-
-2. Install the package:
-
-```bash
-npm install ar-glasses
-```
-
-3. Update `main.js`:
-
-```ts
-import startGlassesOverlay from 'ar-glasses';
-
-const video = document.getElementById('video');
-const canvas = document.getElementById('overlay');
-const image = 'https://yourdomain.com/glasses.png';
-
-startGlassesOverlay(video, canvas, image);
-```
-
-4. Run the dev server:
-
-```bash
-npm run dev
-```
-
----
-
-## 🧠 Powered By
+## 🧠 **Powered By**
 
 - [face-api.js](https://github.com/justadudewhohacks/face-api.js)
 - TypeScript
@@ -149,11 +163,8 @@ npm run dev
 
 ---
 
-## 📜 License
+## 📜 **License**
 
 MIT License © 2025
-```
 
 ---
-
-Let me know if you'd like me to generate this as a downloadable file or commit it to a specific repo structure!
