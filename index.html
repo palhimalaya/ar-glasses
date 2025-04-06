@@ -38,7 +38,7 @@
       height="480"
     ></video>
     <canvas id="overlay" width="640" height="480"></canvas>
-    <script src="./dist/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ar-glasses/dist/ar-glasses.umd.js"></script>
     <script type="module">
       const video = document.getElementById("video");
       const canvas = document.getElementById("overlay");
@@ -64,7 +64,7 @@
 
       startButton.addEventListener("click", () => {
         if (glassesImageDataURL) {
-          arGlasses.startGlassesOverlay(video, canvas, glassesImageDataURL);
+          ARGlasses.startGlassesOverlay(video, canvas, glassesImageDataURL);
         } else {
           alert("Please upload a glasses image first!");
         }
