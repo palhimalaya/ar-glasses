@@ -6,12 +6,12 @@ export default async function startGlassesOverlay(
   canvas: HTMLCanvasElement,
   glassesUrl: string,
 ) {
-  // const MODEL_PATH = "./models";
+  const MODEL_PATH = "https://raw.githubusercontent.com/palhimalaya/ar-glasses/refs/heads/main/src/models/";
   
   // Load models in parallel
   await Promise.all([
-    faceapi.nets.tinyFaceDetector.loadFromUri("https://raw.githubusercontent.com/justadudewhohacks/face-api.js-models/refs/heads/master/tiny_face_detector/"),
-    faceapi.nets.faceLandmark68Net.loadFromUri("https://raw.githubusercontent.com/justadudewhohacks/face-api.js-models/refs/heads/master/face_landmark_68/"),
+    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_PATH),
+    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_PATH ),
   ]);
 
   const displaySize = { width: video.width, height: video.height };
